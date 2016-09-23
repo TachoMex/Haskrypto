@@ -116,8 +116,15 @@ module Haskrypto.Modular(
 
 	square_root :: (Integral a) => (Modular a) -> (Modular a)
 	square_root m@(Modular y p)
-		| is_safe_fermat_prime p = power m a
+		| is_safe_fermat_prime p = root
 		| otherwise =  error "I don't know how to calculate it"
 		where
 			a = val $ inverse (Modular 2 q)
 			q = (p - 1) `div` 2
+			sr = power m a
+			v = val sr
+			root = if 2 * v > p
+				then
+					modular (-v) p
+				else
+					sr

@@ -3,10 +3,10 @@ module Haskrypto.ElipticCurve(
     ElipticCurve(..),
     bf_find_all,
     belong,
-    sum_points,
+    add,
     evaluate,
     multiply,
-    negative
+    negative,
   )where
   import Haskrypto.Modular
 
@@ -46,10 +46,10 @@ module Haskrypto.ElipticCurve(
       x' = val x
       y' = val y
 
-  sum_points :: (Integral t) => ElipticCurve t -> Point t -> Point t -> Point t
-  sum_points _ Infinity a = a
-  sum_points _ a Infinity = a
-  sum_points (ElipticCurve a b p) (Point (x1,y1)) (Point (x2,y2))
+  add :: (Integral t) => ElipticCurve t -> Point t -> Point t -> Point t
+  add _ Infinity a = a
+  add _ a Infinity = a
+  add (ElipticCurve a b p) (Point (x1,y1)) (Point (x2,y2))
     | fx1 == fx2 && fy1 == (val $ modular (-fy2) p) = Infinity
     | fx1 == fx2 && fy1 == fy2 = Point (x3', y3')
     | otherwise = Point (x3, y3)
@@ -71,7 +71,7 @@ module Haskrypto.ElipticCurve(
   multiply e p 1 = p
   multiply e p n = t
     where
-      t = sum_points e x $ sum_points e x $ multiply e p $ mod n 2
+      t = add e x $ add e x $ multiply e p $ mod n 2
       x = multiply e p $ n `div` 2
 
   negative (Point (x,y)) = Point (x,-y)
