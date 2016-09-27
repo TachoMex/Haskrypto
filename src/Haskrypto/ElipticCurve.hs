@@ -39,7 +39,7 @@ module Haskrypto.ElipticCurve(
   belong (ElipticCurve a b n) (Point (x,y)) =
     y * y  `mod` n == (x * x * x + a * x + b) `mod` n
 
-  evaluate :: (Integral t) => ElipticCurve t -> Modular t -> Point t
+  evaluate :: ElipticCurve Integer -> Modular Integer -> Point Integer
   evaluate (ElipticCurve a b n) x = Point (x',y')
     where
       y = square_root (x*x*x + (Modular a n)*x + (Modular b n))

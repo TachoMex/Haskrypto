@@ -10,10 +10,13 @@ module Haskrypto.Modular(
 		next_coprime,
 		gcd',
 		square_root,
-		modular
+		modular,
+		next_safe_prime,
+		is_safe_fermat_prime
 )where
 	import System.Random
 	import Data.Bool
+	import Debug.Trace
 	-- HCN -> Highly Composite Number
 	hcn_for_fermat_test = 720720
 
@@ -69,7 +72,7 @@ module Haskrypto.Modular(
 			then
 				(modular inverse_a n)
 			else
-				error "GCD is not 1"
+				error $ "GCD is not 1"
 			where
 				(gcd', inverse_a, _) = extended_euclidean a n
 
@@ -86,7 +89,7 @@ module Haskrypto.Modular(
 			ap = x * x * (power a (mod p 2))
 			x  = power a $ div p 2
 
-	fermat_primality_test :: (Integral a) => a -> Bool
+	fermat_primality_test ::  Integer -> Bool
 	fermat_primality_test p = power (modular a p) p == modular a p
 		where a = hcn_for_fermat_test
 
@@ -110,11 +113,22 @@ module Haskrypto.Modular(
 	gcd' a 0 = a
 	gcd' a b = gcd' b $ mod a b
 
-	is_safe_fermat_prime :: (Integral a) => a -> Bool
+	is_safe_fermat_prime :: Integer -> Bool
 	is_safe_fermat_prime p = fermat_primality_test p && fermat_primality_test q
 		where q = (p - 1) `div` 2
 
-	square_root :: (Integral a) => (Modular a) -> (Modular a)
+	next_safe_prime :: Integer -> Integer
+	next_safe_prime a
+		| a `mod` 2 == 0 = next_safe_prime' (a+1)
+		| otherwise = next_safe_prime' a
+
+	next_safe_prime' :: Integer -> Integer
+	next_safe_prime' a
+		| is_safe_fermat_prime (2*a+1) = a
+		| otherwise = next_safe_prime' (a+2) `debug` (show a)
+			where debug = flip trace
+
+	square_root :: Modular Integer -> Modular Integer
 	square_root m@(Modular y p)
 		| is_safe_fermat_prime p = root
 		| otherwise =  error "I don't know how to calculate it"
