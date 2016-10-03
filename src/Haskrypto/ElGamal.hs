@@ -23,7 +23,7 @@ where
   crypt message (ElGamalKey curve@(ElipticCurve _ _ primo) public_p password _) public_key = coded
     where
       coded = add curve noise m_point
-      m_point = evaluate curve (Modular message primo)
+      m_point = evaluate curve message
       noise = multiply curve public_key password
 
   decrypt :: Point Integer -> ElGamalKey -> Point Integer -> Point Integer
@@ -31,5 +31,3 @@ where
     where
       message = add curve noise coded
       noise = negative $ multiply curve public_key pass
-
-

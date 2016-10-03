@@ -39,12 +39,13 @@ module Haskrypto.ElipticCurve(
   belong (ElipticCurve a b n) (Point (x,y)) =
     y * y  `mod` n == (x * x * x + a * x + b) `mod` n
 
-  evaluate :: ElipticCurve Integer -> Modular Integer -> Point Integer
-  evaluate (ElipticCurve a b n) x = Point (x',y')
+  evaluate :: ElipticCurve Integer -> Integer -> Point Integer
+  evaluate curve@(ElipticCurve a b n) v = Point (v, y')
     where
+      x = modular v n
       y = square_root (x*x*x + (Modular a n)*x + (Modular b n))
-      x' = val x
       y' = val y
+
 
   add :: (Integral t) => ElipticCurve t -> Point t -> Point t -> Point t
   add _ Infinity a = a
@@ -75,5 +76,3 @@ module Haskrypto.ElipticCurve(
       x = multiply e p $ n `div` 2
 
   negative (Point (x,y)) = Point (x,-y)
-
-
