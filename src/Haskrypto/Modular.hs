@@ -12,11 +12,17 @@ module Haskrypto.Modular(
 		square_root,
 		modular,
 		next_safe_prime,
+		legendre_symbol,
 		is_safe_fermat_prime
 )where
 	import System.Random
 	import Data.Bool
 	import Debug.Trace
+	import GHC.Exception
+	import GHC.Stack
+	import Data.List
+
+
 	-- HCN -> Highly Composite Number
 	hcn_for_fermat_test = 720720
 
@@ -42,7 +48,7 @@ module Haskrypto.Modular(
 
 	instance (Integral t, Ord t) => Num (Modular t) where
 		(Modular a n) + (Modular b m) =
-			if m==n
+			if m == n
 				then
 					(modular ((a + b) `mod` n) n)
 				else
@@ -130,15 +136,19 @@ module Haskrypto.Modular(
 
 	square_root :: Modular Integer -> Modular Integer
 	square_root m@(Modular y p)
-		| is_safe_fermat_prime p = root
+		| is_safe_fermat_prime p = comprobate_sqrt root m
 		| otherwise =  error "I don't know how to calculate it"
 		where
 			a = val $ inverse (Modular 2 q)
 			q = (p - 1) `div` 2
-			sr = power m a
-			v = val sr
-			root = if 2 * v > p
-				then
-					modular (-v) p
-				else
-					sr
+			root = power m a
+
+	legendre_symbol :: Integer -> Integer -> Integer
+	legendre_symbol a p = if (val $ (Modular a p) ^ (div p 2)) == 1
+														then (-1)
+														else 1
+
+
+	comprobate_sqrt y1 y2
+	  | y1 * y1 == y2 = y1
+		| otherwise = error $ "Error while calculating square_root of " ++ show y1
