@@ -19,11 +19,10 @@ where
     public = multiply c p' pass
   }
 
-  crypt :: Integer -> ElGamalKey -> Point Integer -> Point Integer
-  crypt message (ElGamalKey curve@(ElipticCurve _ _ primo) public_p password _) public_key = coded
+  crypt :: Point Integer -> ElGamalKey -> Point Integer -> Point Integer
+  crypt m_point (ElGamalKey curve@(ElipticCurve _ _ primo) public_p password _) public_key = coded
     where
       coded = add curve noise m_point
-      m_point = evaluate curve message
       noise = multiply curve public_key password
 
   decrypt :: Point Integer -> ElGamalKey -> Point Integer -> Point Integer
@@ -31,3 +30,6 @@ where
     where
       message = add curve noise coded
       noise = negative $ multiply curve public_key pass
+
+  calculate_noise :: ElGamalKey -> Point Integer -> Point Integer
+  calculate_noise (ElGamalKey curve _ password _) public_key = multiply curve public_key password
