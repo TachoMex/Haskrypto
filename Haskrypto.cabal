@@ -65,7 +65,9 @@ library
   -- other-extensions:
 
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.6 && <4.7, random >=1.1 && <1.2, bytestring >=0.10 && <0.11
+  build-depends:       base >=4.6,
+                       random,
+                       bytestring
 
   -- Directories containing source files.
   hs-source-dirs:      src
