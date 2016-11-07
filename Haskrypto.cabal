@@ -53,7 +53,7 @@ library
   -- Modules exported by the library.
   exposed-modules:
     Haskrypto.ElGamal,
-    Haskrypto.ElipticCurve,
+    Haskrypto.EllipticCurve,
     Haskrypto.RSA,
     Haskrypto.Modular,
     Haskrypto.Conversions

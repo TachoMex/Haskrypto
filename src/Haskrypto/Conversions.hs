@@ -8,8 +8,8 @@ where
 
   hex n = showHex n ""
 
-  password_generate :: GHC.Int.Int64 -> BL.ByteString -> Integer
-  password_generate bytes message = unbincode aux_string
+  passwordGenerate :: GHC.Int.Int64 -> BL.ByteString -> Integer
+  passwordGenerate bytes message = unbincode aux_string
     where
       fixed_message = BL.take bytes $ BL.cycle message
       aux_string = reverse $ BL.unpack fixed_message

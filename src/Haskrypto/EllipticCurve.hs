@@ -1,23 +1,24 @@
-module Haskrypto.ElipticCurve(
+module Haskrypto.EllipticCurve(
     Point(..),
-    ElipticCurve(..),
-    bf_find_all,
+    EllipticCurve(..),
+    bfFindAll,
     belong,
     add,
     evaluate,
+    evaluateSquare,
     multiply,
     negative,
   )where
   import Haskrypto.Modular
 
-  data ElipticCurve t = ElipticCurve {
+  data EllipticCurve t = EllipticCurve {
     a :: t,
     b :: t,
     field :: t
   }
 
-  instance (Show t) => Show (ElipticCurve t) where
-    show (ElipticCurve a b n) =
+  instance (Show t) => Show (EllipticCurve t) where
+    show (EllipticCurve a b n) =
       "y^2 = x^3 + " ++
       show a ++
       "x + " ++
@@ -31,26 +32,33 @@ module Haskrypto.ElipticCurve(
     show Infinity = "0"
     show (Point p) = show p
 
-  bf_find_all curve@(ElipticCurve a b n) =
+  bfFindAll curve@(EllipticCurve a b n) =
     filter (belong curve) pairs
     where
       pairs = [Point (x, y) | x <- [0..n-1], y <- [0..n-1]]
 
-  belong (ElipticCurve a b n) (Point (x,y)) =
+  belong (EllipticCurve a b n) (Point (x,y)) =
     y * y  `mod` n == (x * x * x + a * x + b) `mod` n
 
-  evaluate :: ElipticCurve Integer -> Integer -> Point Integer
-  evaluate curve@(ElipticCurve a b n) v = Point (v, y')
+  evaluate :: EllipticCurve Integer -> Integer -> Point Integer
+  evaluate curve@(EllipticCurve a b n) v = Point (v, y')
     where
       x = modular v n
-      y = square_root (x*x*x + (Modular a n)*x + (Modular b n))
+      y = squareRoot (x*x*x + (Modular a n)*x + (Modular b n))
       y' = val y
 
+  evaluateSquare :: EllipticCurve Integer -> Integer -> Point Integer
+  evaluateSquare curve@(EllipticCurve a b n) v = Point (v,val y)
+    where
+      x = modular v n
+      y = squareRoot (x*x*x + (Modular a n)*x + (Modular b n))
 
-  add :: (Integral t) => ElipticCurve t -> Point t -> Point t -> Point t
+
+
+  add :: (Integral t) => EllipticCurve t -> Point t -> Point t -> Point t
   add _ Infinity a = a
   add _ a Infinity = a
-  add (ElipticCurve a b p) (Point (x1,y1)) (Point (x2,y2))
+  add (EllipticCurve a b p) (Point (x1,y1)) (Point (x2,y2))
     | fx1 == fx2 && fy1 == (val $ modular (-fy2) p) = Infinity
     | fx1 == fx2 && fy1 == fy2 = Point (x3', y3')
     | otherwise = Point (x3, y3)
@@ -67,7 +75,7 @@ module Haskrypto.ElipticCurve(
       fy1 = val $ modular y1 p
       fy2 = val $ modular y2 p
 
-  multiply :: (Integral t) => ElipticCurve t -> Point t -> t -> Point t
+  multiply :: (Integral t) => EllipticCurve t -> Point t -> t -> Point t
   multiply e p 0 = Infinity
   multiply e p 1 = p
   multiply e p n = t
